@@ -1,10 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 
-// Optional: npm install use-sound
-// import useSound from 'use-sound'
-// import clickSfx from './sounds/click.mp3'
-// import winSfx from './sounds/win.mp3'
-// import loseSfx from './sounds/lose.mp3'
+const LOSE_SOUND = '/sounds/lose.mp3'
+const WIN_SOUND = '/sounds/win.mp3'
 
 const HAND_CLOSED = 'closed'
 const HAND_EMPTY = 'empty'
@@ -41,7 +38,7 @@ function HandCard({ hand, onClick, disabled, isRevealing }) {
       onClick={() => canClick && onClick(hand.id)}
       disabled={!canClick}
       className={`
-        relative w-full aspect-[3/4] max-w-[200px] rounded-xl overflow-hidden
+        relative w-full aspect-[3/4] max-w-[360px] rounded-xl overflow-hidden
         transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900
         ${canClick ? 'cursor-pointer hover:scale-105 active:scale-95' : 'cursor-default'}
         ${isRevealing ? 'animate-flip-in' : ''}
@@ -94,6 +91,14 @@ export default function App() {
   useEffect(() => {
     if (gameOver !== 'won' && gameOver !== 'lost') return
     setOverlayVisible(true)
+    if (gameOver === 'lost') {
+      const audio = new Audio(LOSE_SOUND)
+      audio.play().catch(() => {})
+    }
+    if (gameOver === 'won') {
+      const audio = new Audio(WIN_SOUND)
+      audio.play().catch(() => {})
+    }
     const t = setTimeout(() => setOverlayVisible(false), 1000)
     return () => clearTimeout(t)
   }, [gameOver])
@@ -112,7 +117,6 @@ export default function App() {
       setRevealingId(clickedId)
 
       if (hand.hasRing) {
-        // Optional: playLose?.()
         setHands((prev) =>
           prev.map((h) => (h.id === clickedId ? { ...h, state: HAND_RING } : h))
         )
@@ -184,7 +188,7 @@ export default function App() {
         >
           Reset Game / جولة جديدة
         </button>
-        <div className="grid grid-cols-5 gap-4 md:gap-6 max-w-4xl">
+        <div className="grid grid-cols-5 gap-4 md:gap-6 max-w-6xl">
           {hands.map((hand) => (
             <HandCard
               key={hand.id}
@@ -195,12 +199,13 @@ export default function App() {
             />
           ))}
         </div>
-        {effectiveGameOver && (
-          <p className="mt-8 text-xl md:text-2xl text-amber-400 font-bold">
-            اليد الصحيحة كانت رقم: {ringIndex + 1}
-          </p>
-        )}
       </main>
+
+      <footer className="py-4 border-t border-gray-700/50 bg-gray-900/80">
+        <p className="text-center text-xl md:text-2xl text-amber-400 font-bold">
+          رقم اليد الصحيحة: {ringIndex + 1}
+        </p>
+      </footer>
 
       <Overlay show={showWinOverlay} variant="win" text="لقد فزت" />
       <Overlay show={showLoseOverlay} variant="lost" text="لقد خسرت" />
