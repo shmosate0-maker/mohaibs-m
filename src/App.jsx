@@ -41,7 +41,7 @@ function HandCard({ hand, onClick, disabled, isRevealing }) {
       onClick={() => canClick && onClick(hand.id)}
       disabled={!canClick}
       className={`
-        relative w-full aspect-[3/4] max-w-[140px] rounded-xl overflow-hidden
+        relative w-full aspect-[3/4] max-w-[200px] rounded-xl overflow-hidden
         transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900
         ${canClick ? 'cursor-pointer hover:scale-105 active:scale-95' : 'cursor-default'}
         ${isRevealing ? 'animate-flip-in' : ''}
@@ -184,7 +184,7 @@ export default function App() {
         >
           Reset Game / جولة جديدة
         </button>
-        <div className="grid grid-cols-5 gap-3 md:gap-4 max-w-2xl">
+        <div className="grid grid-cols-5 gap-4 md:gap-6 max-w-4xl">
           {hands.map((hand) => (
             <HandCard
               key={hand.id}
@@ -195,6 +195,11 @@ export default function App() {
             />
           ))}
         </div>
+        {effectiveGameOver && (
+          <p className="mt-8 text-xl md:text-2xl text-amber-400 font-bold">
+            اليد الصحيحة كانت رقم: {ringIndex + 1}
+          </p>
+        )}
       </main>
 
       <Overlay show={showWinOverlay} variant="win" text="لقد فزت" />
